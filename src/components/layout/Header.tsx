@@ -73,10 +73,10 @@ const Header: React.FC = () => {
               Fun
             </Link>
             <Link
-              to="/myculture"
+              to="/community"
               className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
             >
-              MyCulture
+              GoeCommunity
             </Link>
             <Link
               to="/mytype"
@@ -145,11 +145,11 @@ const Header: React.FC = () => {
                 Fun
               </Link>
               <Link
-                to="/myculture"
+                to="/community"
                 className="px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                MyCulture
+                GoeCommunity
               </Link>
               <Link
                 to="/mytype"

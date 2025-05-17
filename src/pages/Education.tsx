@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Search, Filter, Loader2 } from 'lucide-react';
+import { Search, Filter, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import Hero from '../components/ui/Hero';
 import SectionTitle from '../components/ui/SectionTitle';
@@ -24,9 +24,13 @@ interface Country {
   latlng: [number, number];
 }
 
+const ITEMS_PER_PAGE_OPTIONS = [12, 24, 36, 48];
+
 const Education: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRegion, setSelectedRegion] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
 
   const { data: countries, isLoading, error } = useQuery<Country[]>({
     queryKey: ['countries'],
@@ -54,6 +58,18 @@ const Education: React.FC = () => {
       return matchesSearch && matchesRegion;
     });
   }, [countries, searchTerm, selectedRegion]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredCountries.length / itemsPerPage);
+  const paginatedCountries = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredCountries.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredCountries, currentPage, itemsPerPage]);
+
+  // Reset to first page when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedRegion, itemsPerPage]);
 
   if (error) {
     return (
@@ -97,6 +113,19 @@ const Education: React.FC = () => {
               ))}
             </select>
           </div>
+          <div className="relative">
+            <select
+              className="pl-4 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={itemsPerPage}
+              onChange={(e) => setItemsPerPage(Number(e.target.value))}
+            >
+              {ITEMS_PER_PAGE_OPTIONS.map(option => (
+                <option key={option} value={option}>
+                  {option} per page
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Map Section */}
@@ -111,7 +140,7 @@ const Education: React.FC = () => {
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            {filteredCountries.map((country) => (
+            {paginatedCountries.map((country) => (
               <Marker
                 key={country.name.common}
                 position={[country.latlng[0], country.latlng[1]]}
@@ -145,7 +174,7 @@ const Education: React.FC = () => {
               <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
             </div>
           ) : (
-            filteredCountries.map((country) => (
+            paginatedCountries.map((country) => (
               <a
                 key={country.name.common}
                 href={`/country/${encodeURIComponent(country.name.common)}`}
@@ -183,6 +212,46 @@ const Education: React.FC = () => {
               </a>
             ))
           )}
+        </div>
+
+        {/* Pagination Controls */}
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl shadow-sm">
+          <div className="text-sm text-gray-600 bg-white px-4 py-2 rounded-lg shadow-sm">
+            Showing <span className="font-semibold text-blue-600">{((currentPage - 1) * itemsPerPage) + 1}</span> to{' '}
+            <span className="font-semibold text-blue-600">{Math.min(currentPage * itemsPerPage, filteredCountries.length)}</span> of{' '}
+            <span className="font-semibold text-indigo-600">{filteredCountries.length}</span> countries
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="p-2 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed bg-white hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 shadow-sm"
+            >
+              <ChevronLeft className="w-5 h-5 text-blue-600" />
+            </button>
+            <div className="flex items-center gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`px-3 py-1 rounded-lg transition-all duration-200 shadow-sm ${
+                    currentPage === page
+                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white transform scale-110'
+                      : 'bg-white hover:bg-blue-50 hover:border-blue-300 text-gray-700 hover:text-blue-600'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="p-2 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed bg-white hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 shadow-sm"
+            >
+              <ChevronRight className="w-5 h-5 text-blue-600" />
+            </button>
+          </div>
         </div>
       </div>
     </>

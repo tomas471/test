@@ -1,5 +1,6 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import Home from './pages/Home';
 import About from './pages/About';
@@ -7,8 +8,17 @@ import Education from './pages/Education';
 import CountryDetails from './pages/CountryDetails';
 import Quiz from './pages/Quiz';
 import Fun from "./pages/Fun";
+import GoeCommunity from "./pages/GoeCommunity";
 import MyCulture from "./pages/MyCulture";
 import CultureDetails from "./pages/CultureDetails";
+import GoeJourney from "./pages/GoeJourney";
+import GoeDebate from "./pages/GoeDebate";
+import GoeFacts from "./pages/GoeFacts";
+import GoeTips from "./pages/GoeTips";
+import JourneyDetails from "./pages/JourneyDetails";
+import DebateDetails from "./pages/DebateDetails";
+import FactDetails from "./pages/FactDetails";
+import TipDetails from "./pages/TipDetails";
 import SpellingGame from './pages/games/SpellingGame';
 import PopulationGame from './pages/games/PopulationGame';
 import AreaGame from './pages/games/AreaGame';
@@ -17,115 +27,47 @@ import WordleGame from './pages/games/WordleGame';
 import Account from './pages/Account';
 import Achievements from './pages/Achievements';
 import Badges from './pages/Badges';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 
 const queryClient = new QueryClient();
 
 function App() {
-  const [currentPage, setCurrentPage] = React.useState('home');
-  const [selectedCountry, setSelectedCountry] = React.useState<string | null>(null);
-  const [selectedCultureId, setSelectedCultureId] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    const handleNavigation = () => {
-      const path = window.location.pathname;
-      const countryMatch = path.match(/^\/country\/(.+)$/);
-      const cultureMatch = path.match(/^\/culture\/(.+)$/);
-      
-      if (countryMatch) {
-        setCurrentPage('country');
-        setSelectedCountry(decodeURIComponent(countryMatch[1]));
-      } else if (cultureMatch) {
-        setCurrentPage('culture-details');
-        setSelectedCultureId(decodeURIComponent(cultureMatch[1]));
-      } else if (path === '/about') {
-        setCurrentPage('about');
-        document.title = 'About Us | GoeJungle';
-      } else if (path === '/education') {
-        setCurrentPage('education');
-        document.title = 'Education | GoeJungle';
-      } else if (path === '/quize') {
-        setCurrentPage('quiz');
-        document.title = 'Quiz | GoeJungle';
-      } else if (path === '/fun') {
-        setCurrentPage('fun');
-        document.title = 'Fun | GoeJungle';
-      } else if (path === '/games/spelling') {
-        setCurrentPage('spelling-game');
-        document.title = 'Spelling Challenge | GoeJungle';
-      } else if (path === '/games/population') {
-        setCurrentPage('population-game');
-        document.title = 'Population Challenge | GoeJungle';
-      } else if (path === '/games/area') {
-        setCurrentPage('area-game');
-        document.title = 'Area Challenge | GoeJungle';
-      } else if (path === '/games/guess-country') {
-        setCurrentPage('guess-country-game');
-        document.title = 'Guess the Country | GoeJungle';
-      } else if (path === '/games/wordle') {
-        setCurrentPage('wordle-game');
-        document.title = 'Country Wordle | GoeJungle';
-      } else if (path === '/myculture') {
-        setCurrentPage('myculture');
-        document.title = 'MyCulture | GoeJungle';
-      } else if (path === '/account') {
-        setCurrentPage('account');
-        document.title = 'My Account | GoeJungle';
-      } else if (path === '/achievements') {
-        setCurrentPage('achievements');
-        document.title = 'Achievements | GoeJungle';
-      } else if (path === '/badges') {
-        setCurrentPage('badges');
-        document.title = 'Badges | GoeJungle';
-      } else {
-        setCurrentPage('home');
-        document.title = 'GoeJungle | Explore the World';
-      }
-    };
-
-    handleNavigation();
-
-    window.addEventListener('popstate', handleNavigation);
-
-    document.addEventListener('click', (e) => {
-      if (e.target instanceof HTMLAnchorElement) {
-        const href = e.target.getAttribute('href');
-        if (href && href.startsWith('/')) {
-          e.preventDefault();
-          window.history.pushState({}, '', href);
-          handleNavigation();
-        }
-      }
-    });
-
-    return () => {
-      window.removeEventListener('popstate', handleNavigation);
-    };
-  }, []);
-
   return (
     <QueryClientProvider client={queryClient}>
-      <Layout>
-        {currentPage === 'home' && <Home />}
-        {currentPage === 'about' && <About />}
-        {currentPage === 'education' && <Education />}
-        {currentPage === 'country' && selectedCountry && (
-          <CountryDetails countryName={selectedCountry} />
-        )}
-        {currentPage === 'quiz' && <Quiz />}
-        {currentPage === 'fun' && <Fun />}
-        {currentPage === 'spelling-game' && <SpellingGame />}
-        {currentPage === 'population-game' && <PopulationGame />}
-        {currentPage === 'area-game' && <AreaGame />}
-        {currentPage === 'guess-country-game' && <GuessCountryGame />}
-        {currentPage === 'wordle-game' && <WordleGame />}
-        {currentPage === 'myculture' && <MyCulture />}
-        {currentPage === 'culture-details' && selectedCultureId && (
-          <CultureDetails id={selectedCultureId} />
-        )}
-        {currentPage === 'account' && <Account />}
-        {currentPage === 'achievements' && <Achievements />}
-        {currentPage === 'badges' && <Badges />}
-      </Layout>
+      <Router>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/education" element={<Education />} />
+            <Route path="/country/:countryName" element={<CountryDetails />} />
+            <Route path="/quiz" element={<Quiz />} />
+            <Route path="/fun" element={<Fun />} />
+            <Route path="/games/spelling" element={<SpellingGame />} />
+            <Route path="/games/population" element={<PopulationGame />} />
+            <Route path="/games/area" element={<AreaGame />} />
+            <Route path="/games/guess-country" element={<GuessCountryGame />} />
+            <Route path="/games/wordle" element={<WordleGame />} />
+            <Route path="/community" element={<GoeCommunity />} />
+            <Route path="/community/goejourney" element={<GoeJourney />} />
+            <Route path="/journey/:id" element={<JourneyDetails />} />
+            <Route path="/community/geodebate" element={<GoeDebate />} />
+            <Route path="/debate/:id" element={<DebateDetails />} />
+            <Route path="/community/geofacts" element={<GoeFacts />} />
+            <Route path="/facts/:id" element={<FactDetails />} />
+            <Route path="/community/geotips" element={<GoeTips />} />
+            <Route path="/tips/:id" element={<TipDetails />} />
+            <Route path="/myculture" element={<MyCulture />} />
+            <Route path="/culture/:id" element={<CultureDetails />} />
+            <Route path="/account" element={<Account />} />
+            <Route path="/achievements" element={<Achievements />} />
+            <Route path="/badges" element={<Badges />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+          </Routes>
+        </Layout>
+      </Router>
     </QueryClientProvider>
   );
 }

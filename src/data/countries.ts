@@ -689,6 +689,7 @@ export const countries: Country[] = [
     {
         flag: 'https://flagcdn.com/bv.svg',
         country: 'Bouvet Island',
+        capital : 'bouvet city',
         difficulty: 'hard'
     },
     {
@@ -772,6 +773,7 @@ export const countries: Country[] = [
     {
         flag: 'https://flagcdn.com/hm.svg',
         country: 'Heard Island and McDonald Islands',
+        capital : 'heard' ,
         difficulty: 'hard'
     },
     {
